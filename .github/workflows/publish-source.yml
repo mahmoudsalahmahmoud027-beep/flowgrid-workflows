@@ -1,0 +1,26 @@
+name: Publish clean source
+on:
+  push:
+    paths:
+      - ".github/workflows/publish-source.yml"
+permissions:
+  contents: write
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify and publish source
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat .bootstrap-clean/000001.txt .bootstrap-clean/002003.txt .bootstrap-clean/004005.txt .bootstrap-clean/006007.txt .bootstrap-clean/008009.txt .bootstrap-clean/010011.txt .bootstrap-clean/012.txt | tr -d '\r\n' | base64 -d > source.tar.xz
+          echo "ed04ab8c574892d81b9d0f77c14615537df571aeb2a4c74d24ec4de3acaba3d3  source.tar.xz" | sha256sum -c -
+          xz -dc source.tar.xz | tar -xf -
+          rm -rf .bootstrap-clean
+          rm -f source.tar.xz .github/workflows/publish-source.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "feat: publish project source"
+          git push

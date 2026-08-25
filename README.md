@@ -1,3 +1,0 @@
-# FlowGrid
-
-Source tree initialization.
